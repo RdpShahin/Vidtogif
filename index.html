@@ -1,379 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Modern Custom Video Player</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background: #121212;
-      color: #e0e0e0;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
-      min-height: 100vh;
-    }
-
-    h2 {
-      font-weight: 600;
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
-      text-align: center;
-      color: #bb86fc;
-    }
-
-    #inputContainer {
-      width: 100%;
-      max-width: 720px;
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    #videoLink {
-      flex-grow: 1;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      background-color: #1f1f1f;
-      color: #e0e0e0;
-      box-shadow: inset 0 0 8px rgba(187, 134, 252, 0.4);
-      transition: box-shadow 0.3s ease;
-    }
-    #videoLink:focus {
-      box-shadow: 0 0 12px #bb86fc;
-    }
-
-    #loadBtn {
-      background-color: #bb86fc;
-      color: #121212;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      padding: 0 1.5rem;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-      flex-shrink: 0;
-    }
-    #loadBtn:hover {
-      background-color: #9c67f0;
-    }
-
-    #videoContainer {
-      width: 100%;
-      max-width: 800px;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 8px 20px rgba(187, 134, 252, 0.5);
-      background-color: #000;
-      position: relative;
-    }
-
-    video {
-      width: 100%;
-      display: block;
-      background-color: #000;
-      border-radius: 12px 12px 0 0;
-      outline: none;
-    }
-
-    #progress {
-      height: 8px;
-      background: #333;
-      cursor: pointer;
-      width: 100%;
-      position: relative;
-    }
-
-    #progressFilled {
-      width: 0%;
-      height: 100%;
-      background: #bb86fc;
-      border-radius: 8px;
-      transition: width 0.1s linear;
-    }
-
-    #controls {
-      margin-top: 15px;
-      max-width: 800px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      align-items: center;
-    }
-
-    button, select, input[type=range] {
-      background: #1f1f1f;
-      border-radius: 8px;
-      border: none;
-      padding: 10px 14px;
-      color: #e0e0e0;
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      transition: background-color 0.3s ease, box-shadow 0.3s ease;
-      user-select: none;
-    }
-    button:hover, select:hover, input[type=range]:hover {
-      background: #3c2f70;
-      box-shadow: 0 4px 14px #bb86fc;
-    }
-
-    select {
-      min-width: 100px;
-      appearance: none;
-      background-image:
-        linear-gradient(45deg, transparent 50%, #bb86fc 50%),
-        linear-gradient(135deg, #bb86fc 50%, transparent 50%);
-      background-position:
-        calc(100% - 20px) calc(1em + 2px),
-        calc(100% - 15px) calc(1em + 2px);
-      background-size: 5px 5px;
-      background-repeat: no-repeat;
-      padding-right: 30px;
-    }
-
-    label {
-      font-weight: 500;
-      user-select: none;
-      margin-left: 5px;
-      margin-right: -10px;
-    }
-
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 120px;
-      background: transparent;
-    }
-    input[type=range]:focus {
-      outline: none;
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 6px;
-      background: #bb86fc;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      border: none;
-      height: 20px;
-      width: 20px;
-      border-radius: 50%;
-      background: #eee;
-      cursor: pointer;
-      margin-top: -7px;
-      transition: background 0.3s ease;
-    }
-    input[type=range]::-webkit-slider-thumb:hover {
-      background: #fff;
-    }
-
-    /* Firefox */
-    input[type=range]::-moz-range-track {
-      width: 100%;
-      height: 6px;
-      background: #bb86fc;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    input[type=range]::-moz-range-thumb {
-      border: none;
-      height: 20px;
-      width: 20px;
-      border-radius: 50%;
-      background: #eee;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    input[type=range]::-moz-range-thumb:hover {
-      background: #fff;
-    }
-
-    #screenshotCanvas {
-      display: none;
-    }
-
-    @media (max-width: 600px) {
-      #controls {
-        flex-direction: column;
-      }
-      button, select, input[type=range] {
-        width: 100%;
-        max-width: 320px;
-      }
-      #inputContainer {
-        flex-direction: column;
-      }
-      #loadBtn {
-        width: 100%;
-      }
-    }
-  </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            height: 100vh;
+            justify-content: center;
+        }
+        #container {
+            text-align: center;
+        }
+        #videoContainer {
+            position: relative;
+            width: 640px;
+            max-width: 100%;
+            background: black;
+        }
+        #videoPlayer {
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+        #progressBar {
+            width: 100%;
+            height: 10px;
+            background: #ccc;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #progress {
+            height: 100%;
+            background: #007bff;
+            width: 0;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #urlInput {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+        }
+        #leftSide, #rightSide {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            opacity: 0;
+        }
+        #leftSide {
+            left: 0;
+        }
+        #rightSide {
+            right: 0;
+        }
+    </style>
 </head>
 <body>
-
-  <h2>Paste your MP4 Video Link</h2>
-  <div id="inputContainer">
-    <input type="text" id="videoLink" placeholder="Direct .mp4 video URL here" />
-    <button id="loadBtn">Load Video</button>
-  </div>
-
-  <div id="videoContainer">
-    <video id="player" controls crossorigin="anonymous"></video>
-    <div id="progress">
-      <div id="progressFilled"></div>
+    <div id="container">
+        <input type="text" id="urlInput" placeholder="Enter video URL">
+        <button onclick="loadVideo()">Play Video</button>
+        <div id="videoContainer">
+            <video id="videoPlayer" controls></video>
+            <div id="leftSide"></div>
+            <div id="rightSide"></div>
+        </div>
+        <div id="progressBar">
+            <div id="progress"></div>
+        </div>
+        <div id="controls">
+            <button onclick="captureScreenshot()">Download Screenshot</button>
+            <button onclick="startGif()">Start GIF</button>
+            <button onclick="stopGif()">Stop GIF</button>
+        </div>
     </div>
-  </div>
 
-  <div id="controls">
-    <button id="backBtn" title="Seek Back 10 Seconds">⏪ Back 10s</button>
-    <button id="forwardBtn" title="Seek Forward 10 Seconds">⏩ Forward 10s</button>
-    <button id="screenshotBtn" title="Take Screenshot">📸 Screenshot</button>
-    <button id="startGifBtn" title="Start GIF Recording">🎬 Start GIF</button>
-    <button id="stopGifBtn" title="Stop & Download GIF">🛑 Stop & Download GIF</button>
-    <button id="pipBtn" title="Toggle Picture-in-Picture">🖼️ PiP</button>
-    <select id="speedSelect" title="Playback Speed">
-      <option value="0.5">0.5x</option>
-      <option value="1" selected>1x Normal</option>
-      <option value="1.5">1.5x</option>
-      <option value="2">2x</option>
-    </select>
-    <label for="volumeSlider" title="Volume Control">🔊</label>
-    <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="1" />
-  </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ffmpeg.js/4.2.9000/ffmpeg.min.js"></script>
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const progressBar = document.getElementById('progressBar');
+        const progress = document.getElementById('progress');
+        const leftSide = document.getElementById('leftSide');
+        const rightSide = document.getElementById('rightSide');
+        let isRecording = false;
+        let frames = [];
+        let startTime = 0;
 
-  <canvas id="screenshotCanvas"></canvas>
-
-  <script>
-    const player = document.getElementById('player');
-    const progress = document.getElementById('progress');
-    const progressFilled = document.getElementById('progressFilled');
-    const canvas = document.getElementById('screenshotCanvas');
-
-    let gifRecorder = null;
-    let gifInterval = null;
-
-    document.getElementById('loadBtn').addEventListener('click', () => {
-      const link = document.getElementById('videoLink').value.trim();
-      if (!link) {
-        alert('Please enter a valid .mp4 video URL');
-        return;
-      }
-      player.src = link;
-      player.load();
-    });
-
-    document.getElementById('backBtn').addEventListener('click', () => {
-      player.currentTime = Math.max(0, player.currentTime - 10);
-    });
-
-    document.getElementById('forwardBtn').addEventListener('click', () => {
-      player.currentTime = Math.min(player.duration, player.currentTime + 10);
-    });
-
-    player.addEventListener('timeupdate', () => {
-      if (!player.duration) return;
-      const percent = (player.currentTime / player.duration) * 100;
-      progressFilled.style.width = percent + '%';
-    });
-
-    progress.addEventListener('click', e => {
-      const rect = progress.getBoundingClientRect();
-      const percent = (e.clientX - rect.left) / rect.width;
-      player.currentTime = percent * player.duration;
-    });
-
-    document.getElementById('screenshotBtn').addEventListener('click', () => {
-      if (!player.videoWidth || !player.videoHeight) return alert('Video not loaded yet!');
-      canvas.width = player.videoWidth;
-      canvas.height = player.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(player, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'screenshot.png';
-        a.click();
-        URL.revokeObjectURL(url);
-      }, 'image/png');
-    });
-
-    document.getElementById('startGifBtn').addEventListener('click', () => {
-      if (!player.videoWidth || !player.videoHeight) return alert('Video not loaded yet!');
-      if (gifRecorder) return alert('GIF recording already in progress!');
-      gifRecorder = new GIF({
-        workers: 2,
-        quality: 10,
-        width: player.videoWidth,
-        height: player.videoHeight
-      });
-      alert(`GIF recording started at ${player.currentTime.toFixed(2)}s`);
-
-      gifInterval = setInterval(() => {
-        canvas.width = player.videoWidth;
-        canvas.height = player.videoHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(player, 0, 0, canvas.width, canvas.height);
-        gifRecorder.addFrame(ctx, {copy: true, delay: 200});
-      }, 200);
-    });
-
-    document.getElementById('stopGifBtn').addEventListener('click', () => {
-      if (!gifRecorder) return alert('No GIF recording in progress!');
-      clearInterval(gifInterval);
-      gifInterval = null;
-
-      gifRecorder.on('finished', blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'video-snippet.gif';
-        a.click();
-        URL.revokeObjectURL(url);
-        gifRecorder = null;
-      });
-
-      alert('Processing GIF...');
-      gifRecorder.render();
-    });
-
-    document.getElementById('pipBtn').addEventListener('click', async () => {
-      try {
-        if (document.pictureInPictureElement) {
-          await document.exitPictureInPicture();
-        } else {
-          await player.requestPictureInPicture();
+        // Load video from URL
+        function loadVideo() {
+            const url = document.getElementById('urlInput').value;
+            if (url) {
+                // Remove download parameters to ensure streaming
+                const cleanUrl = url.replace('&download=true', '').replace('&download_filename=itstyetimetolie.mp4', '');
+                video.src = cleanUrl;
+                video.style.display = 'block';
+                video.play().catch(e => alert('Error playing video: ' + e.message));
+            } else {
+                alert('Please enter a valid URL');
+            }
         }
-      } catch (err) {
-        alert('Picture-in-Picture not supported or failed.');
-      }
-    });
 
-    document.getElementById('speedSelect').addEventListener('change', e => {
-      player.playbackRate = parseFloat(e.target.value);
-    });
+        // Update progress bar
+        video.addEventListener('timeupdate', () => {
+            if (video.duration) {
+                const percent = (video.currentTime / video.duration) * 100;
+                progress.style.width = percent + '%';
+            }
+        });
 
-    document.getElementById('volumeSlider').addEventListener('input', e => {
-      player.volume = parseFloat(e.target.value);
-    });
-  </script>
+        // Seek video using progress bar
+        progressBar.addEventListener('click', (e) => {
+            const rect = progressBar.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            video.currentTime = pos * video.duration;
+        });
+
+        // Double-tap to seek
+        let lastTap = 0;
+        leftSide.addEventListener('click', () => {
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                video.currentTime = Math.max(0, video.currentTime - 10);
+            }
+            lastTap = now;
+        });
+
+        rightSide.addEventListener('click', () => {
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                video.currentTime = Math.min(video.duration, video.currentTime + 10);
+            }
+            lastTap = now;
+        });
+
+        // Capture screenshot
+        function captureScreenshot() {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'screenshot.png';
+            link.click();
+        }
+
+        // GIF recording
+        async function startGif() {
+            if (!isRecording) {
+                isRecording = true;
+                frames = [];
+                startTime = video.currentTime;
+                captureFrames();
+            }
+        }
+
+        async function stopGif() {
+            if (isRecording) {
+                isRecording = false;
+                await createGif();
+            }
+        }
+
+        function captureFrames() {
+            if (!isRecording) return;
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth / 2; // Reduced for performance
+            canvas.height = video.videoHeight / 2;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            frames.push(canvas.toDataURL('image/png'));
+            requestAnimationFrame(captureFrames);
+        }
+
+        async function createGif() {
+            const ffmpeg = FFmpeg.createFFmpeg({ log: false });
+            await ffmpeg.load();
+            const fs = ffmpeg.FS;
+
+            // Write frames to FFmpeg filesystem
+            frames.forEach((frame, i) => {
+                const imgData = frame.split(',')[1];
+                const buffer = Buffer.from(imgData, 'base64');
+                fs('writeFile', `frame${i}.png`, buffer);
+            });
+
+            // Run FFmpeg command to create GIF
+            await ffmpeg.run(
+                '-framerate', '10',
+                '-i', 'frame%d.png',
+                '-vf', 'fps=10,scale=320:-1:flags=lanczos',
+                'output.gif'
+            );
+
+            // Download GIF
+            const gifData = fs('readFile', 'output.gif');
+            const blob = new Blob([gifData], { type: 'image/gif' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'output.gif';
+            link.click();
+
+            // Clean up
+            frames.forEach((_, i) => fs('unlink', `frame${i}.png`));
+            fs('unlink', 'output.gif');
+            ffmpeg.exit();
+        }
+
+        // Handle Enter key to load video
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loadVideo();
+            }
+        });
+    </script>
 </body>
 </html>
